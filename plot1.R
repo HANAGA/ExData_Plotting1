@@ -1,14 +1,26 @@
-dataset_url <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2Fhousehold_power_consumption.zip"
-download.file(dataset_url, "household_power_consumption.zip")
-unzip("household_power_consumption.zip", exdir="household_power_consumption")
 
-dat <- read.table("household_power_consumption/household_power_consumption.txt", header=TRUE, sep=";", stringsAsFactors=FALSE)
+url <- "http://d396qusza40orc.cloudfront.net/exdata%2Fdata%2Fhousehold_power_consumption.zip"
+download.file(url, "power.zip")
+unzip("power.zip", exdir="power")
+tab1 <- read.table("power/household_power_consumption.txt",sep=";", header=TRUE, as.is=TRUE, na.strings="?")
 
-dat$Date <- as.Date(dat$Date, format="%d/%m/%Y")
-dat_sub <- subset(dat, dat$Date=="2007-02-01" | dat$Date=="2007-02-02")
-dat_sub$datetime <- paste(dat_sub$Date, dat_sub$Time)
-dat_sub$datetime <- strptime(dat_sub$datetime, "%Y-%m-%d %H:%M:%S")
 
-dat_sub$Global_active_power <- as.numeric(dat_sub$Global_active_power)
+tab1$Time = paste(tab1$Date, tab1$Time)
 
-hist(dat_sub$Global_active_power, xlab="Global Active Power (kilowatts)", main="Global Active Power", col="red",bty="n")
+tab1$Date <- as.Date(tab1$Date,"%d/%m/%Y")
+tab1$Time <- strptime(tab1$Time,format="%d/%m/%Y %H:%M:%S")
+
+
+tab2 <- tab1[ tab1$Date == as.Date("2007-02-01") | tab1$Date == as.Date("2007-02-02"),]
+
+
+# start screen device in Windows
+windows()                
+with(tab2,hist(tab2$Global_active_power,col="Red",xlab="Global Active Power(kilowatt)", main="Global Active Power"))
+
+dev.copy(png, file = "plot1.png")
+
+# Close PNG device
+dev.off()                                 
+
+
